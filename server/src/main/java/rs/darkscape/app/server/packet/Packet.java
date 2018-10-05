@@ -15,4 +15,8 @@ public final class Packet {
   public PacketDescriptor getDescriptor() {
     return descriptor;
   }
+
+  public ByteBuf getBuffer() {
+    return buffer;
+  }
 }
