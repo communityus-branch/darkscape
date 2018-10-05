@@ -1,0 +1,5 @@
+package rs.darkscape.app.server.packet;
+
+public final class PacketMetadataTable {
+
+}
