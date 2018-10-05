@@ -9,21 +9,15 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import rs.darkscape.app.server.initializer.ServerChannelInitializerComponent;
-import rs.darkscape.app.server.packet.PacketMetadataTable;
+import rs.darkscape.app.server.message.MessageCodec;
+import rs.darkscape.app.server.packet.PacketDescriptorTable;
 import rs.darkscape.app.server.session.SessionManager;
 
 @Module(subcomponents = {
     ServerChannelInitializerComponent.class,
 })
 public final class ServerModule {
-
-  @Provides
-  Logger providesLogger() {
-    return LoggerFactory.getLogger("server");
-  }
 
   @Provides
   @Singleton
@@ -41,15 +35,21 @@ public final class ServerModule {
 
   @Provides
   @Singleton
-  @Named("inbound")
-  PacketMetadataTable providesInboundPacketsMetadata(ServerConfiguration configuration) {
-    return new PacketMetadataTable();
+  SessionManager providesSessionManager() {
+    return new SessionManager();
   }
 
   @Provides
   @Singleton
-  SessionManager providesSessionManager() {
-    return new SessionManager();
+  @Named("inbound")
+  PacketDescriptorTable providesInboundPacketsMetadata(ServerConfiguration configuration) {
+    return new PacketDescriptorTable();
+  }
+
+  @Provides
+  @Singleton
+  MessageCodec providesMessageCodec() {
+    return new MessageCodec();
   }
 
   @Provides

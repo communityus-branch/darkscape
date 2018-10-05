@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+option java_package = "rs.darkscape.proto";
+option java_outer_classname = "Messages";
+
+message AssetServiceConnect {
+  uint32 revision = 1;
+}
+
+message MessageWrapper {
+  oneof message {
+    AssetServiceConnect asset_service_connect = 5;
+  }
+}

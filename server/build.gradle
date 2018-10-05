@@ -1,5 +1,13 @@
+buildscript {
+    dependencies {
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.5'
+    }
+}
+
 plugins {
     id 'net.ltgt.apt' version '0.10'
+    id 'com.google.protobuf' version '0.8.5'
+    id 'idea'
 }
 
 group 'rs.darkscape'

@@ -6,14 +6,14 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
-import rs.darkscape.app.server.packet.PacketMetadataTable;
+import rs.darkscape.app.server.packet.PacketDescriptorTable;
 
 public class BytesToPacketDecoder extends ByteToMessageDecoder {
 
-  private final PacketMetadataTable packets;
+  private final PacketDescriptorTable packets;
 
   @Inject
-  public BytesToPacketDecoder(@Named("inbound") PacketMetadataTable packets) {
+  public BytesToPacketDecoder(@Named("inbound") PacketDescriptorTable packets) {
     this.packets = packets;
   }
 
