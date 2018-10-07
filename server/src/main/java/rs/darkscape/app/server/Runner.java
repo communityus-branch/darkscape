@@ -5,6 +5,7 @@ import com.google.protobuf.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rs.darkscape.proto.Messages.ArchiveServiceConnect;
+import rs.darkscape.proto.Messages.Test;
 
 public class Runner {
 
@@ -14,6 +15,7 @@ public class Runner {
     ServerComponent server = DaggerServerComponent.builder()
         .messages(ImmutableList.<Message>builder()
                       .add(ArchiveServiceConnect.getDefaultInstance())
+                      .add(Test.getDefaultInstance())
                       .build())
         .build();
 

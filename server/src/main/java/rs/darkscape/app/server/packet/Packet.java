@@ -4,11 +4,11 @@ import com.google.protobuf.Descriptors;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Message;
 import io.netty.buffer.ByteBuf;
-import rs.darkscape.proto.Packet.FieldType;
-import rs.darkscape.proto.Packet.Type;
-import rs.darkscape.proto.PacketOptions;
-import rs.darkscape.proto.PacketOptions.FieldOptions;
-import rs.darkscape.proto.PacketOptions.MessageOptions;
+import rs.darkscape.proto.Mappings;
+import rs.darkscape.proto.Mappings.PacketFieldOptions;
+import rs.darkscape.proto.Mappings.PacketOptions;
+import rs.darkscape.proto.Mappings.Source;
+import rs.darkscape.proto.Mappings.Type;
 
 public final class Packet {
 
@@ -23,16 +23,29 @@ public final class Packet {
     this.buffer = buffer;
   }
 
-  public static MessageOptions getMapping(Descriptors.Descriptor descriptor) {
-    return descriptor.getOptions().getExtension(PacketOptions.mapping);
+  public static Descriptor descriptorFor(Message message) {
+    Descriptors.Descriptor desc = message.getDescriptorForType();
+    if (!desc.getOptions().hasExtension(Mappings.packet)) {
+      throw new IllegalArgumentException("Message is not mappable to a packet.");
+    }
+
+    PacketOptions options = message.getDescriptorForType()
+                                   .getOptions()
+                                   .getExtension(Mappings.packet);
+
+    return new Descriptor(message,
+                          options.getSource(),
+                          options.getId(),
+                          getLength(message.getDescriptorForType()));
   }
 
   public static int getLength(Descriptors.Descriptor descriptor) {
-    MessageOptions mapping = getMapping(descriptor);
-    if (mapping == null) {
-      throw new IllegalArgumentException();
+    if (!descriptor.getOptions().hasExtension(Mappings.packet)) {
+      throw new IllegalArgumentException("Message is not mappable to a packet.");
     }
-    switch (mapping.getLength()) {
+
+    PacketOptions options = descriptor.getOptions().getExtension(Mappings.packet);
+    switch (options.getLength()) {
       case STATIC:
         return getStaticBitLength(descriptor);
       case BYTE:
@@ -44,11 +57,11 @@ public final class Packet {
     }
   }
 
-  public static int getStaticLength(Descriptors.Descriptor descriptor) {
+  private static int getStaticLength(Descriptors.Descriptor descriptor) {
     return bitsToBytes(getStaticBitLength(descriptor));
   }
 
-  public static int getStaticBitLength(Descriptors.Descriptor descriptor) {
+  private static int getStaticBitLength(Descriptors.Descriptor descriptor) {
     int length = 0;
     for (FieldDescriptor field : descriptor.getFields()) {
       switch (field.getType()) {
@@ -57,7 +70,7 @@ public final class Packet {
           break;
 
         default:
-          FieldOptions options = field.getOptions().getExtension(PacketOptions.field);
+          PacketFieldOptions options = field.getOptions().getExtension(Mappings.field);
           if (options == null) {
             throw new IllegalStateException();
           }
@@ -75,11 +88,11 @@ public final class Packet {
     return bitsToBytes(length);
   }
 
-  public static int getLength(FieldType type) {
+  public static int getLength(Type type) {
     return bitsToBytes(getBitLength(type));
   }
 
-  public static int getBitLength(FieldType type) {
+  public static int getBitLength(Type type) {
     switch (type) {
       case INT8:
         return 8;
@@ -126,28 +139,23 @@ public final class Packet {
   public static final class Descriptor {
 
     private final Message message;
-    private final Type type;
+    private final Source source;
     private final int id;
     private final int length;
 
-    public Descriptor(Message message) {
-      Descriptors.Descriptor descriptor = message.getDescriptorForType();
-      MessageOptions options = descriptor.getOptions().getExtension(PacketOptions.mapping);
-      if (options == null) {
-        throw new IllegalArgumentException("Message is not mappable to a packet.");
-      }
+    private Descriptor(Message message, Source source, int id, int length) {
       this.message = message;
-      this.type = options.getType();
-      this.id = options.getId();
-      this.length = Packet.getLength(descriptor);
+      this.source = source;
+      this.id = id;
+      this.length = length;
     }
 
     public Message getMessage() {
       return message;
     }
 
-    public Type getType() {
-      return type;
+    public Source getSource() {
+      return source;
     }
 
     public int getId() {

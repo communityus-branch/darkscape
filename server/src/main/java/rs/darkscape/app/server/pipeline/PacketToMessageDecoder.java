@@ -1,7 +1,5 @@
 package rs.darkscape.app.server.pipeline;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Message.Builder;
@@ -9,25 +7,26 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import javax.inject.Inject;
-import javax.inject.Named;
+import rs.darkscape.app.server.FieldOrderings;
 import rs.darkscape.app.server.packet.Packet;
-import rs.darkscape.proto.PacketOptions;
-import rs.darkscape.proto.PacketOptions.FieldOptions;
+import rs.darkscape.proto.Mappings;
+import rs.darkscape.proto.Mappings.PacketFieldOptions;
 
 public final class PacketToMessageDecoder extends MessageToMessageDecoder<Packet> {
 
-  private final ImmutableMap<Descriptor, ImmutableSet<Integer>> orderings;
+  private final Map<Descriptor, Set<Integer>> orderings;
 
   @Inject
-  public PacketToMessageDecoder(
-      @Named("orderings") ImmutableMap<Descriptor, ImmutableSet<Integer>> orderings) {
+  PacketToMessageDecoder(@FieldOrderings Map<Descriptor, Set<Integer>> orderings) {
     this.orderings = orderings;
   }
 
   @Override
   protected void decode(ChannelHandlerContext ctx, Packet packet, List<Object> out) {
-    ImmutableSet<Integer> ordering = orderings.get(packet.getMessageDescriptor());
+    Set<Integer> ordering = orderings.get(packet.getMessageDescriptor());
     if (ordering == null) {
       throw new NullPointerException("Expecting ordering for message to be non-null.");
     }
@@ -41,10 +40,11 @@ public final class PacketToMessageDecoder extends MessageToMessageDecoder<Packet
         throw new NullPointerException("Ordering referred to field that does not exist.");
       }
 
-      FieldOptions options = field.getOptions().getExtension(PacketOptions.field);
-      if (options == null) {
-        throw new NullPointerException("Field is missing type mapping.");
+      if (!field.getOptions().hasExtension(Mappings.field)) {
+        throw new NullPointerException("Field is missing mappings.");
       }
+
+      PacketFieldOptions options = field.getOptions().getExtension(Mappings.field);
 
       ByteBuf buffer = packet.getBuffer();
       switch (options.getType()) {

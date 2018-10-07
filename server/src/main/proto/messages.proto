@@ -1,13 +1,16 @@
 syntax = "proto3";
 
-import "options.proto";
-import "packet.proto";
+import "mappings.proto";
 
 option java_package = "rs.darkscape.proto";
 
 message ArchiveServiceConnect {
-  option (darkscape.packet.mapping).id = 15;
-  option (darkscape.packet.mapping).type = INBOUND;
+  option (darkscape.packet).id = 15;
+  option (darkscape.packet).source = CLIENT;
 
-  uint32 revision = 1 [(darkscape.packet.field).type = INT32];
+  uint32 revision = 1 [(darkscape.field).type = INT32];
+}
+
+message Test {
+
 }

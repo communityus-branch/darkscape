@@ -14,7 +14,7 @@ public final class UpstreamExceptionHandler extends ChannelHandlerAdapter {
   UpstreamExceptionHandler() {}
 
   @Override
-  public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+  public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
     logger.error("Exception caught upstream", cause);
   }
 }
