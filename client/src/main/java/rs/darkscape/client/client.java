@@ -1815,7 +1815,7 @@ public final class client extends class47 implements class288 {
         }
 
         class177.method3513();
-        class54.field485 = this.getCodeBase().getHost();
+        class54.field485 = /*this.getCodeBase().getHost()*/"127.0.0.1"; // TODO
         String string_7 = class266.field3346.field3135;
         byte b_8 = 0;
 

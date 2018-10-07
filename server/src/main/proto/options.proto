@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package darkscape.packet;
+
+import "google/protobuf/descriptor.proto";
+import "packet.proto";
+
+option java_package = "rs.darkscape.proto";
+option java_outer_classname = "PacketOptions";
+
+message FieldOptions {
+  FieldType type = 1;
+}
+
+extend google.protobuf.FieldOptions {
+  FieldOptions field = 70000;
+}
+
+message MessageOptions {
+  Type type = 1;
+  int32 id = 2;
+  Length length = 3;
+}
+
+extend google.protobuf.MessageOptions {
+  MessageOptions mapping = 70000;
+}

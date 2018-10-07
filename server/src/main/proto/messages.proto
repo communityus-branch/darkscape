@@ -1,14 +1,13 @@
 syntax = "proto3";
 
+import "options.proto";
+import "packet.proto";
+
 option java_package = "rs.darkscape.proto";
-option java_outer_classname = "Messages";
 
-message AssetServiceConnect {
-  uint32 revision = 1;
-}
+message ArchiveServiceConnect {
+  option (darkscape.packet.mapping).id = 15;
+  option (darkscape.packet.mapping).type = INBOUND;
 
-message MessageWrapper {
-  oneof message {
-    AssetServiceConnect asset_service_connect = 5;
-  }
+  uint32 revision = 1 [(darkscape.packet.field).type = INT32];
 }

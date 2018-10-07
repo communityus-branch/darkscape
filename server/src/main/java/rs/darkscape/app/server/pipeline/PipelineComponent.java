@@ -6,12 +6,13 @@ import rs.darkscape.app.server.session.Session;
 
 @Subcomponent
 public interface PipelineComponent {
-  OutboundExceptionHandler outboundExceptionHandler();
+  DownstreamExceptionHandler downstreamExceptionHandler();
   BytesToPacketDecoder bytesToPacketDecoder();
   PacketToBytesEncoder packetToBytesEncoder();
   PacketToMessageDecoder packetToMessageDecoder();
   MessageToPacketEncoder messageToPacketEncoder();
   MessageHandler messageHandler();
+  UpstreamExceptionHandler upstreamExceptionHandler();
   DeregisterListener deregisterListener();
 
   @Subcomponent.Builder

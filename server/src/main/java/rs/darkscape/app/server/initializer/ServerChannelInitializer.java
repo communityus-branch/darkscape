@@ -25,22 +25,23 @@ public final class ServerChannelInitializer extends ChannelInitializer<SocketCha
   @Override
   protected void initChannel(SocketChannel ch) {
     Session session = DaggerSessionComponent.builder()
-        .uuid(UUID.randomUUID())
-        .socketChannel(ch)
-        .builder()
-        .session();
+                                            .uuid(UUID.randomUUID())
+                                            .socketChannel(ch)
+                                            .builder()
+                                            .session();
 
     PipelineComponent pipeline = pipelineProvider.get()
-        .session(session)
-        .build();
+                                                 .session(session)
+                                                 .build();
 
     ch.pipeline()
-        .addLast(pipeline.outboundExceptionHandler())
-        .addLast(pipeline.bytesToPacketDecoder())
-        .addLast(pipeline.packetToBytesEncoder())
-        .addLast(pipeline.packetToMessageDecoder())
-        .addLast(pipeline.messageToPacketEncoder())
-        .addLast(pipeline.messageHandler());
+      .addLast(pipeline.downstreamExceptionHandler())
+      .addLast(pipeline.bytesToPacketDecoder())
+      .addLast(pipeline.packetToBytesEncoder())
+      .addLast(pipeline.packetToMessageDecoder())
+      .addLast(pipeline.messageToPacketEncoder())
+      .addLast(pipeline.messageHandler())
+      .addLast(pipeline.upstreamExceptionHandler());
 
     ch.closeFuture().addListener(pipeline.deregisterListener());
 
